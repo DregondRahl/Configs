@@ -1,6 +1,6 @@
 [![Picture](http://gotux.net/images/gotux.png)](http://gotux.net/)
 <hr>
-PHP Scripts Coded by TuxLyn <[GoTux.net](http://gotux.net/)>
+Configuration Files Coded by TuxLyn <[GoTux.net](http://gotux.net/)>
 
  * BadWords.conf &raquo; [ [Code](badwords.conf) | [Wiki](../../wiki/NginxBadWords) ] -- Nginx "BadWords" block config.
  * Errors.conf &raquo; [ [Code](errors.conf) | [Wiki](../../wiki/NginxErrors) ] -- Nginx "Errors" config.
