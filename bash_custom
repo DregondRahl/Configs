@@ -1,0 +1,292 @@
+#
+# ~/.bash_custom
+#
+
+# Bash Custom v1.5 (for Bash 4+)
+# by Tux <GoTux.net> {2013-08-19}
+# License: GNU v3 <gnu.org>
+
+
+# Custom Alias (Quick Shortcuts)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+: Terminal
+alias x='exit'
+alias c='clear'
+alias h='history -c'
+alias ...='exec $SHELL'
+
+: System
+alias vol='alsactl store'
+alias lk='xflock4'
+alias zzz='halt -p'
+alias cron='crontab -e'
+alias mem='free -mho'
+alias mon='top | grep $1'
+
+: Network
+alias ngx='nginx -s reload'
+alias ngt='nginx -t'
+alias prt='netstat -tulanp'
+alias ips='netstat -an | grep ESTABLISHED'
+
+: Downloaders
+alias wg='wget'
+alias cl='curl'
+alias a2='aria2c'
+alias px='proxychains'
+
+: Pacman
+alias pu='pacman -Syu'
+alias pi='pacman -S '
+alias ai='pacman -U '
+alias pr='pacman -Rsn '
+alias pf='pacman -Ss '
+alias pq='pacman -Qi '
+alias pqi='pacman -Si'
+alias prc='pacman -Rs $(pacman -Qtdq)'
+
+: Watch Command
+# usage: w5 'commands go here'
+alias w1='watch -n60'
+alias w3='watch -n180'
+alias w5='watch -n300'
+alias w10='watch -n600'
+alias w15='watch -n900'
+alias w30='watch -n1800'
+alias w1h='watch -n3600'
+
+: Useful
+alias now='date +"%A (%u), %B (%m) %d (%j), %Y @ %r (%N)"'
+alias hdd='echo "Filesystem      Size  Used Avail Use% Mounted on"; df -h | grep hdd | sort'
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# Custom Scripts (Paths & Alias)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+BashDir='/your/scripts/directory'
+alias news="$BashDir/msnbcpod.sh"
+# alias ezhost="$BashDir/ezhost.sh"
+# alias setdns="$BashDir/setdns.sh"
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# Custom One-Liners (Functions)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+: System
+mkcd() { mkdir -p "$1" && cd "$1"; }
+mkmv() { mkdir -p "$1" && mv -v "$2" "$1"; }
+mkcp() { mkdir -p "$1" && cp -v "$2" "$1"; }
+
+: Network
+smb() { smbstatus; }
+isp() { wget -qO - http://ipecho.net/plain; echo; }
+rfs() { curl -sI "$1" | awk '/Content-Length/ {print $2}'; } # add to help!
+
+: Archives
+tgz() { tar cvzf "$1" "$2"; }
+xgz() { tar xvzf "$1" "$2"; }
+
+# usage: tarSplit <dir> <size> <archive>
+tarSplit() { tar cvzfp - "$1" | split -d -b "${2}M" - "${3}.tgz."; }
+
+# usage: tarJoin <archive>
+tarJoin() { cat "${1}.tgz.*" | tar -xvpzf - -C .; }
+
+# usage: rarSplit <size_in_kb> <archive> <dir>
+rarSplit() { rar a -v"$1" "${2}.rar" "$3"; }
+
+# usage: rarJoin <archive>
+rarJoin() { rar a -v"$1" "${2}.rar" "$3"; }
+
+: Useful
+gf() { grep -liR "$1" --include="*.$2"; }
+pqd() { pacman -Qi "$1" | awk -F: '/Description/ {print $2}'; }
+fixvid() { mencoder -forceidx -oac copy -ovc copy "$1" -o "$2"; } # add to help!
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# SystemCtl (system control)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+sc() {
+  case $1 in
+    -s) systemctl start $2; echo "$2 Daemon Started" ;;
+    -k) systemctl stop $2; echo "$2 Daemon Stopped" ;;
+    -r) systemctl restart $2; echo $2 Daemon Restarted ;;
+    -d) systemctl --system daemon-reload; echo "$2 Daemon Reloaded" ;;
+    *|-h) printf "
+Usage: sc <option>
+  -s \t start services
+  -k \t stop services
+  -r \t restart services
+  -d \t reload config
+\n" ;;
+  esac
+} #sc
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# Nginx/PHP/MySQL (SystemCtl)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+srv() {
+  case $1 in
+    -s) systemctl start mysqld php-fpm nginx; echo 'Servers Started' ;;
+    -k) systemctl stop mysqld php-fpm nginx; echo 'Servers Stopped' ;;
+    -r) systemctl restart mysqld php-fpm nginx; echo 'Servers Restarted' ;;
+    *) echo 'srv [-s|-k|-r]' ;;
+  esac
+} #srv
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# HDD Temp
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+temp() {
+  hdd=( sda sdb )
+  echo "~~~~~~~~~~~~~"
+  for hdd in ${hdd[@]}; do
+    hdC=$(sudo hddtemp -u C -n /dev/$hdd)
+    echo " $hdd.....${hdC}C"
+    hdF=$(sudo hddtemp -u F -n /dev/$hdd)
+    echo " $hdd.....${hdF}F"
+    echo "~~~~~~~~~~~~~"
+  done
+} #temp
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# IPTables (firewall)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+fw() {
+  case $1 in
+    -l) iptables -L ;;
+    -s) systemctl start iptables; echo 'IPTables Daemon Started' ;;
+    -k) systemctl stop iptables; echo 'IPTables Daemon Stopped' ;;
+    -r) systemctl restart iptables; echo IPTables Daemon Restarted ;;
+    -S) iptables-save > /etc/iptables/iptables.rules; echo 'IPTables Rules Saved' ;;
+    *|-h) printf "
+Usage: fw <option>
+  -l \t list iptables rules
+  -s \t start iptables daemon
+  -k \t stop iptables daemon
+  -r \t restart iptables daemon
+  -S \t save iptables daemon
+  -h \t show this help and exit
+\n" ;;
+  esac
+} #fw
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# Temporary Workarounds
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+panel() {
+  PID=$(ps aux | grep xfce4-panel | \
+    head -n1 | awk '{print $2}')
+  kill -9 $PID
+} #panel
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# Custom Bash (Help & Usage)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+cbhelp() {
+
+printf " :: Bash Custom v1.5\n :: by Tux {2013-08-19}\n"
+
+case "$1" in
+  --alias)
+printf "
+ Terminal:
+  x \t exit from terminal
+  c \t clear bash screen
+  h \t clean bash history
+  ... \t reload terminal
+
+ System:
+  vol \t save alsa volume
+  lk \t lock xfce screen
+  zzz \t shutdown computer
+  cron \t run cron editor
+  mem \t show memory status
+  mon \t show selected top
+
+ Network:
+  ngx \t reload nginx config
+  ngt \t test nginx config
+  prt \t show active ports
+  ips \t show active ips
+
+ Downloaders:
+  wg \t run wget
+  cl \t run curl
+  a2 \t run aria2c
+  px \t run proxychains
+
+ Pacman:
+  pu \t update packages
+  pi \t install package
+  ai \t install aur package
+  pr \t remove package
+  pf \t find package
+  pq \t package info
+  pqi \t more package info
+  prc \t remove uneeded packages
+
+ Watch Command:
+  w1 \t run command every 1min
+  w3 \t run command every 3min
+  w5 \t run command every 5min
+  w10 \t run command every 10min
+  w15 \t run command every 15min
+  w30 \t run command every 30min
+  w1h \t run command every 1hr
+" ;;
+
+  --func)
+printf "
+ System:
+  mkcd \t make dir and cd into it
+   usage: mkcd <dir>
+  mkmv \t make dir and move file into it
+   usage: mkmv <dir> <file>
+  mkcp \t make dir and copy file into it
+   usage: mkcp <dir> <file>
+
+ Network:
+  smb \t show samba status
+  isp \t show external ip
+
+ Archives:
+  tgz \t create tgz archive
+   usage: tgz <archive.tgz> <file/dir>
+  xgz \t extract tgz archive
+   usage: xgz <archive.tgz>
+
+ Useful:
+  gf \t find string in specific file types
+   usage: gf <string> <extension>
+    example: gf 'function doSomething()' php
+  pqd \t find package description
+" ;;
+
+  *)
+printf "
+ Usage: cbhelp <option>
+  --alias, show alias help
+  --func, show functions help
+" ;;
+
+esac
+
+} #cbhelp
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#EOF: .bash_custom
