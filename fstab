@@ -1,0 +1,39 @@
+#
+# /etc/fstab
+#
+
+# Arch Linux (Partitions)
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Swap
+/dev/sda2  none  swap  defaults  0 0
+
+# Temp (adjust 256M to your own size)
+tmpfs  /tmp  tmpfs  nodev,nosuid,noexec,size=256M,mode=1777 0 0
+
+# Boot [ /boot ]
+/dev/sda1  /boot  ext4  rw,relatime,data=ordered  0 2
+
+# Root [ / ]
+/dev/sda3  /  ext4  rw,relatime,data=ordered  0 1
+
+# Home [ /home ]
+/dev/sda4  /home  ext4  rw,nodiratime,noatime,data=ordered  0 2
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+# Extra Hard Drives
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+# Use "blkid" to find UUID and create "/hdd/" folder to mount all of this extra hard drives.
+
+# HDD-1 [ /dev/sdb ]
+UUID="#"  /hdd/one
+
+# HDD-2 [ /dev/sdc ]
+UUID="#"  /hdd/two
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+#EOF: fstab
